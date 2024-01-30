@@ -94,6 +94,7 @@ class ResourceManager
     // If none of that is true, return an un-initialized unique_ptr
     std::cout << "\nERROR:\n Get request for nonexistent asset\n"
               << typeid(AssetType).name() << ", name: " << name << std::endl;
+
     return *container["NULL"];
   }
 
@@ -113,39 +114,47 @@ class ResourceManager
     std::string path = asset_directory + directory;
     std::string filename;
 
-    // Iterate trough each element found in the path
-    for (const auto& file : rdi(path))
+    //If the folder is non-existent throws an error and aborts loading
+    try
     {
-      // Filename is path + name
-      filename = file.path().filename().string();
-      // Creates a unique ptr of the current asset
-      std::unique_ptr<Asset> filePtr = std::make_unique<Asset>();
-      bool loaded                    = false;
+      // Iterate trough each element found in the path
+      for (const auto& file : rdi(path))
+      {
+        // Filename is path + name
+        filename = file.path().filename().string();
+        // Creates a unique ptr of the current asset
+        std::unique_ptr<Asset> filePtr = std::make_unique<Asset>();
+        bool loaded                    = false;
 
-      // A shader has different parameters for loading in, therefore a
-      // const-expression is needed to differentiate to other assets
-      if constexpr (std::is_same<sf::Shader, Asset>::value)
-      {
-        // loads shaders as fragment shaders
-        loaded = filePtr->loadFromFile(path + filename, sf::Shader::Fragment);
-      }
-      else
-      {
-        loaded = filePtr->loadFromFile(path + filename);
-      }
+        // A shader has different parameters for loading in, therefore a
+        // const-expression is needed to differentiate to other assets
+        if constexpr (std::is_same<sf::Shader, Asset>::value)
+        {
+          // loads shaders as fragment shaders
+          loaded = filePtr->loadFromFile(path + filename, sf::Shader::Fragment);
+        }
+        else
+        {
+          loaded = filePtr->loadFromFile(path + filename);
+        }
 
-      // if the asset has been loaded correctly, change the ownership
-      // of the unique ptr owning the asset to the unique ptr inside the
-      // provided data container
-      if (loaded)
-      {
-        std::cout << "Loaded " + filename << std::endl;
-        container[filename] = std::move(filePtr);
+        // if the asset has been loaded correctly, change the ownership
+        // of the unique ptr owning the asset to the unique ptr inside the
+        // provided data container
+        if (loaded)
+        {
+          std::cout << "Loaded " + filename << std::endl;
+          container[filename] = std::move(filePtr);
+        }
+        else
+        {
+          std::cout << "Failed to Load " + path << std::endl;
+        }
       }
-      else
-      {
-        std::cout << "Failed to Load " + path << std::endl;
-      }
+    }
+    catch (std::filesystem::__cxx11::filesystem_error)
+    {
+      std::cout << "Folder '" << path << "' not found" << std::endl;
     }
   }
 

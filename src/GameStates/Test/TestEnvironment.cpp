@@ -24,7 +24,7 @@ bool TestEnvironment::init()
     "HELLO", data.window->getSize().x / 2, data.window->getSize().y / 2, 150, sf::Color::Red);
 
   card_sprite_front.setTexture(
-    data.resources->getTexture("card_front.png"));
+    data.resources->getTexture("toastFront.png"));
   card_sprite_front.setOrigin(
     card_sprite_front.getGlobalBounds().width / 2,
     card_sprite_front.getGlobalBounds().height / 2);
@@ -34,7 +34,7 @@ bool TestEnvironment::init()
   card_sprite_front.scale(card_scale);
 
   card_sprite_back.setTexture(
-    data.resources->getTexture("card_back.png"));
+    data.resources->getTexture("toastBack1.png"));
   card_sprite_back.setOrigin(
     card_sprite_back.getGlobalBounds().width / 2,
     card_sprite_back.getGlobalBounds().height / 2);
